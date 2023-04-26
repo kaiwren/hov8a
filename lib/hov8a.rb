@@ -2,7 +2,6 @@
 
 require 'csv'
 require 'date'
-require 'pp'
 require 'fileutils'
 
 require_relative 'hov8a/version'

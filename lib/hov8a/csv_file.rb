@@ -24,7 +24,7 @@ module Hov8a
     end
 
     def file_contents_without_panelists
-      file_contents[row_number_of_attendee_details..-1]
+      file_contents[row_number_of_attendee_details..]
     end
 
     def rows_of_attendee_data
@@ -33,12 +33,14 @@ module Hov8a
 
     def attendees
       return @attendees if @attendees
+
       @attendees, @non_attendees = split_attendees_and_non_attendees
       @attendees
     end
 
     def non_attendees
       return @non_attendees if @non_attendees
+
       @attendees, @non_attendees = split_attendees_and_non_attendees
       @non_attendees
     end
@@ -51,11 +53,7 @@ module Hov8a
       unique_attendee_emails.map do |unique_email|
         duplicate_attendees = attendees.select { |attendee| attendee[4] == unique_email }
         if duplicate_attendees.count > 1
-          total_time_in_session = 0
-          duplicate_attendees.each { |attendee| total_time_in_session += attendee[9].to_i }
-          collated_attendee = duplicate_attendees[0].dup
-          collated_attendee[9] = total_time_in_session.to_s
-          collated_attendee
+          sum_time_in_session_for_duplicate_attendees(duplicate_attendees)
         else
           duplicate_attendees[0]
         end
@@ -104,10 +102,19 @@ module Hov8a
                   "#{unique_attendees_with_time_in_session_summed.count} rows written to #{unique_attendees_file_path}")
       export_csv!(unique_attendees_above_attendance_threshold_file_path,
                   unique_attendees_above_attendance_threshold,
-                  "#{unique_attendees_above_attendance_threshold.count} rows written to #{unique_attendees_above_attendance_threshold_file_path}")
+                  "#{unique_attendees_above_attendance_threshold.count} rows written \
+to #{unique_attendees_above_attendance_threshold_file_path}")
     end
 
     private
+
+    def sum_time_in_session_for_duplicate_attendees(duplicate_attendees)
+      total_time_in_session = 0
+      duplicate_attendees.each { |attendee| total_time_in_session += attendee[9].to_i }
+      collated_attendee = duplicate_attendees[0].dup
+      collated_attendee[9] = total_time_in_session.to_s
+      collated_attendee
+    end
 
     def split_attendees_and_non_attendees
       rows_of_attendee_data.partition { |row| row[0] == 'Yes' }
