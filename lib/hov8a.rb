@@ -5,11 +5,9 @@ require 'date'
 require 'pp'
 require 'fileutils'
 
-require_relative "hov8a/version"
-require_relative "hov8a/processor"
+require_relative 'hov8a/version'
+require_relative 'hov8a/csv_file'
 
 module Hov8a
   class Error < StandardError; end
-
-  # Your code goes here...
 end

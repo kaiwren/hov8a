@@ -1,16 +1,14 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require "bundler/setup"
-require "hov8a"
+require 'bundler/setup'
+require 'hov8a'
 
 file_1_path = ARGV[0]
 file_1_attendance_threshold_in_minutes = ARGV[1].to_i
 file_2_path = ARGV[2]
 file_2_attendance_threshold_in_minutes = ARGV[3].to_i
 out_dir = 'out'
-FileUtils.mkdir_p(out_dir)
 
-
-Hov8a::Processor.new(file_1_path, file_1_attendance_threshold_in_minutes, out_dir).process!
-Hov8a::Processor.new(file_2_path, file_2_attendance_threshold_in_minutes, out_dir).process!
+Hov8a::CsvFile.new(file_1_path, file_1_attendance_threshold_in_minutes, out_dir).process!
+Hov8a::CsvFile.new(file_2_path, file_2_attendance_threshold_in_minutes, out_dir).process!

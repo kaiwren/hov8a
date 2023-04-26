@@ -13,3 +13,5 @@
 .rspec_status
 
 *.csv
+.DS_Store
+/*.gem

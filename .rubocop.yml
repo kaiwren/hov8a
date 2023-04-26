@@ -1,0 +1,12 @@
+require:
+  - rubocop-rspec
+  - rubocop-rake
+
+AllCops:
+  NewCops: enable
+
+RSpec/ExampleLength:
+  CountAsOne: ['array', 'hash', 'heredoc']
+
+Style/Documentation:
+  Enabled: false
