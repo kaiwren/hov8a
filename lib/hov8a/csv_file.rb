@@ -98,6 +98,10 @@ module Hov8a
         out_dir,
         "unique_attendees_above_attendance_threshold_#{file_name}"
       )
+      unique_attendees_below_attendance_threshold_file_path = File.join(
+        out_dir,
+        "unique_attendees_below_attendance_threshold_#{file_name}"
+      )
 
       File.write(input_text_to_csv_parser, file_contents_without_panelists)
       Kernel.puts "Input file to CSV parser #{input_text_to_csv_parser}"
@@ -116,6 +120,10 @@ module Hov8a
                   unique_attendees_above_attendance_threshold,
                   "#{unique_attendees_above_attendance_threshold.count} rows written \
 to #{unique_attendees_above_attendance_threshold_file_path}")
+      export_csv!(unique_attendees_below_attendance_threshold_file_path,
+                  unique_attendees_below_attendance_threshold,
+                  "#{unique_attendees_below_attendance_threshold.count} rows written \
+to #{unique_attendees_below_attendance_threshold_file_path}")
     end
 
     private
