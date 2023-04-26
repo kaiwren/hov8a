@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email = ["hov8a@gmail.com"]
 
   spec.summary = "Daily Attendance Processor."
-  spec.description = "Daily Attendance Processor with relavent analytics"
+  spec.description = "Daily Attendance Processor with relevant analytics"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.1.0"
 
@@ -26,6 +26,8 @@ Gem::Specification.new do |spec|
 
   # Uncomment to register a new dependency of your gem
   # spec.add_dependency "example-gem", "~> 1.0"
+  spec.add_development_dependency 'rspec', ['~> 3.11']
+  spec.add_development_dependency 'rubocop', ['~> 1.35.0']
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html

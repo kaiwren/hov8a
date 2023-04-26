@@ -12,5 +12,5 @@ out_dir = 'out'
 FileUtils.mkdir_p(out_dir)
 
 
-file_processor(file_1_path, file_1_attendance_threshold_in_minutes, out_dir)
-file_processor(file_2_path, file_2_attendance_threshold_in_minutes, out_dir)
+Hov8a::Processor.new(file_1_path, file_1_attendance_threshold_in_minutes, out_dir).process!
+Hov8a::Processor.new(file_2_path, file_2_attendance_threshold_in_minutes, out_dir).process!
