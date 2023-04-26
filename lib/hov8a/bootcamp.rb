@@ -35,13 +35,13 @@ module Hov8a
     end
 
     def unique_non_attendees
-      unique_non_attendee_emails.map do |unique_email|
+      @unique_non_attendees ||= unique_non_attendee_emails.map do |unique_email|
         bootcamp_non_attendees.find { |non_attendee| non_attendee[4] == unique_email }
       end
     end
 
     def unique_attendees_below_threshold
-      unique_attendee_emails.map do |unique_email|
+      @unique_attendees_below_threshold ||= unique_attendee_emails.map do |unique_email|
         bootcamp_attendees_below_threshold.find { |non_attendee| non_attendee[4] == unique_email }
       end.compact
     end
@@ -51,6 +51,7 @@ module Hov8a
       @day_2_file.process!
       unique_non_attendees_path = File.join(@out_dir, 'unique_non_attendees_across_both_days.csv')
       unique_attendees_below_threshold_path = File.join(@out_dir, 'unique_attendees_across_both_days_below_threshold.csv')
+      unique_non_attendees_and_unique_attendees_below_threshold_path = File.join(@out_dir, 'unique_non_attendees_and_unique_attendees_below_threshold.csv')
 
       Kernel.puts('Please wait...')
       export_csv!(unique_non_attendees_path,
@@ -60,6 +61,10 @@ module Hov8a
       export_csv!(unique_attendees_below_threshold_path,
                   unique_attendees_below_threshold,
                   "#{unique_attendees_below_threshold.count} bootcamp-wide unique attendees below attendance threshold exported to #{unique_attendees_below_threshold_path}")
+
+      export_csv!(unique_non_attendees_and_unique_attendees_below_threshold_path,
+                  unique_non_attendees + unique_attendees_below_threshold,
+                  "#{unique_non_attendees.count + unique_attendees_below_threshold.count} bootcamp-wide unique non attendees and unique attendees below attendance threshold exported to #{unique_non_attendees_and_unique_attendees_below_threshold_path}")
     end
   end
 end
