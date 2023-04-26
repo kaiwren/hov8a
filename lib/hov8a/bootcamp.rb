@@ -25,24 +25,31 @@ module Hov8a
       ).uniq
     end
 
-    def bootcamp_non_attendees
-      @bootcamp_non_attendees ||= @day_1_file.non_attendees + @day_2_file.non_attendees
+    def bootcamp_non_attendees_email_index
+      return @bootcamp_non_attendees_email_index if @bootcamp_non_attendees_email_index
+
+      @bootcamp_non_attendees_email_index = {}
+      bootcamp_non_attendees = @day_1_file.non_attendees + @day_2_file.non_attendees
+      bootcamp_non_attendees.each do |non_attendee|
+        @bootcamp_non_attendees_email_index[non_attendee[4]] ||= non_attendee
+      end
+      @bootcamp_non_attendees_email_index
     end
 
     def bootcamp_attendees_below_threshold
       @bootcamp_attendees_below_threshold ||= @day_1_file.unique_attendees_below_attendance_threshold +
-        @day_2_file.unique_attendees_below_attendance_threshold
+                                              @day_2_file.unique_attendees_below_attendance_threshold
     end
 
     def unique_non_attendees
       @unique_non_attendees ||= unique_non_attendee_emails.map do |unique_email|
-        bootcamp_non_attendees.find { |non_attendee| non_attendee[4] == unique_email }
+        bootcamp_non_attendees_email_index[unique_email]
       end
     end
 
     def unique_attendees_below_threshold
       @unique_attendees_below_threshold ||= unique_attendee_emails.map do |unique_email|
-        bootcamp_attendees_below_threshold.find { |non_attendee| non_attendee[4] == unique_email }
+        bootcamp_attendees_below_threshold.find { |attendee| attendee[4] == unique_email }
       end.compact
     end
 
