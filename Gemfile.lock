@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    hov8a (0.1.0)
+    hov8a (0.1.2)
 
 GEM
   remote: https://rubygems.org/

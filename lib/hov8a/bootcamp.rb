@@ -49,12 +49,14 @@ module Hov8a
     def process!
       @day_1_file.process!
       @day_2_file.process!
-      unique_non_attendees_path = File.join(@out_dir, 'unique_non_attendees.csv')
+      unique_non_attendees_path = File.join(@out_dir, 'unique_non_attendees_across_both_days.csv')
+      unique_attendees_below_threshold_path = File.join(@out_dir, 'unique_attendees_across_both_days_below_threshold.csv')
+
       Kernel.puts('Please wait...')
-      unique_attendees_below_threshold_path = File.join(@out_dir, 'unique_attendees_below_threshold.csv')
       export_csv!(unique_non_attendees_path,
                   unique_non_attendees,
                   "#{unique_non_attendees.count} bootcamp-wide unique non attendees exported to #{unique_non_attendees_path}")
+
       export_csv!(unique_attendees_below_threshold_path,
                   unique_attendees_below_threshold,
                   "#{unique_attendees_below_threshold.count} bootcamp-wide unique attendees below attendance threshold exported to #{unique_attendees_below_threshold_path}")

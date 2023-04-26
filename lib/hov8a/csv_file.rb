@@ -13,7 +13,7 @@ module Hov8a
     end
 
     def file_contents
-      @file_contents ||= File.readlines(file_path)
+      @file_contents ||= File.read(file_path)
     end
 
     def unique_emails
@@ -24,15 +24,15 @@ module Hov8a
       location = file_contents.index(@marker_indicating_start_of_attendee_section)
       raise 'Attendee Details section badly demarcated' if location.nil?
 
-      location + 1
+      location + @marker_indicating_start_of_attendee_section.length
     end
 
     def file_contents_without_panelists
-      file_contents[row_number_of_attendee_details..]
+      @file_contents_without_panelists ||= file_contents[row_number_of_attendee_details..]
     end
 
     def rows_of_attendee_data
-      CSV.new(file_contents_without_panelists.join, headers: true).read
+      @rows_of_attendee_data ||= CSV.new(file_contents_without_panelists, headers: true, liberal_parsing: true).read
     end
 
     def attendees
@@ -90,6 +90,7 @@ module Hov8a
       FileUtils.mkdir_p(out_dir)
 
       file_name = File.basename(file_path)
+      input_text_to_csv_parser = File.join(out_dir, "preprocessed_#{file_name}")
       attendees_file_path = File.join(out_dir, "attendees_#{file_name}")
       non_attendees_file_path = File.join(out_dir, "non_attendees_#{file_name}")
       unique_attendees_file_path = File.join(out_dir, "unique_attendees_#{file_name}")
@@ -98,7 +99,10 @@ module Hov8a
         "unique_attendees_above_attendance_threshold_#{file_name}"
       )
 
-      Kernel.puts "Attendee Details section found at row #{row_number_of_attendee_details}"
+      File.write(input_text_to_csv_parser, file_contents_without_panelists)
+      Kernel.puts "Input file to CSV parser #{input_text_to_csv_parser}"
+
+      Kernel.puts "Attendee Details section found at position #{row_number_of_attendee_details}"
       Kernel.puts "#{unique_emails.count} unique emails found among all rows #{rows_of_attendee_data.count}"
       Kernel.puts "#{unique_attendee_emails.count} unique attendee emails found among #{attendees.count} attendees"
 
