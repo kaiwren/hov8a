@@ -2,6 +2,7 @@
 
 module Hov8a
   class CsvFile
+    include Export
     attr_reader :file_path, :attendance_threshold, :out_dir
 
     def initialize(file_path, attendance_threshold, out_dir)
@@ -20,7 +21,10 @@ module Hov8a
     end
 
     def row_number_of_attendee_details
-      file_contents.index(@marker_indicating_start_of_attendee_section) + 1
+      location = file_contents.index(@marker_indicating_start_of_attendee_section)
+      raise 'Attendee Details section badly demarcated' if location.nil?
+
+      location + 1
     end
 
     def file_contents_without_panelists
@@ -49,6 +53,10 @@ module Hov8a
       @unique_attendee_emails ||= attendees.map { |attendee| attendee[4] }.uniq
     end
 
+    def non_attendee_emails_non_unique
+      non_attendees.map { |non_attendee| non_attendee[4] }
+    end
+
     def unique_attendees_with_time_in_session_summed
       unique_attendee_emails.map do |unique_email|
         duplicate_attendees = attendees.select { |attendee| attendee[4] == unique_email }
@@ -61,17 +69,19 @@ module Hov8a
     end
 
     def unique_attendees_above_attendance_threshold
-      @unique_attendees_above_attendance_threshold ||= unique_attendees_with_time_in_session_summed.select do |attendee|
-        attendee[9].to_i > attendance_threshold
-      end
+      return @unique_attendees_above_attendance_threshold if @unique_attendees_above_attendance_threshold
+
+      @unique_attendees_above_attendance_threshold,
+        @unique_attendees_below_attendance_threshold = split_unique_attendees_into_delinquent_and_non_delinquent
+      @unique_attendees_above_attendance_threshold
     end
 
-    def export_csv!(file_path, rows, message)
-      CSV.open(file_path, 'w') do |csv|
-        rows.each { |row| csv << row }
-      end
+    def unique_attendees_below_attendance_threshold
+      return @unique_attendees_below_attendance_threshold if @unique_attendees_below_attendance_threshold
 
-      Kernel.puts(message)
+      @unique_attendees_above_attendance_threshold,
+        @unique_attendees_below_attendance_threshold = split_unique_attendees_into_delinquent_and_non_delinquent
+      @unique_attendees_below_attendance_threshold
     end
 
     def process!
@@ -87,8 +97,6 @@ module Hov8a
         out_dir,
         "unique_attendees_above_attendance_threshold_#{file_name}"
       )
-
-      raise 'Attendee Details section badly demarcated' if row_number_of_attendee_details.nil?
 
       Kernel.puts "Attendee Details section found at row #{row_number_of_attendee_details}"
       Kernel.puts "#{unique_emails.count} unique emails found among all rows #{rows_of_attendee_data.count}"
@@ -114,6 +122,12 @@ to #{unique_attendees_above_attendance_threshold_file_path}")
       collated_attendee = duplicate_attendees[0].dup
       collated_attendee[9] = total_time_in_session.to_s
       collated_attendee
+    end
+
+    def split_unique_attendees_into_delinquent_and_non_delinquent
+      unique_attendees_with_time_in_session_summed.partition do |attendee|
+        attendee[9].to_i > attendance_threshold
+      end
     end
 
     def split_attendees_and_non_attendees

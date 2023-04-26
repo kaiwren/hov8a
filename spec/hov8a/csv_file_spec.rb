@@ -18,4 +18,12 @@ RSpec.describe Hov8a::CsvFile do
   it 'has the expected number of non-attendees' do
     expect(day_1_file.non_attendees.count).to eq(8_454)
   end
+
+  it 'has the expected number of unique attendees above the attendance threshold' do
+    expect(day_1_file.unique_attendees_above_attendance_threshold.count).to eq(467)
+  end
+
+  it 'has the expected number of unique attendees below the attendance threshold' do
+    expect(day_1_file.unique_attendees_below_attendance_threshold.count).to eq(1082)
+  end
 end

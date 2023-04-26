@@ -10,5 +10,5 @@ file_2_path = ARGV[2]
 file_2_attendance_threshold_in_minutes = ARGV[3].to_i
 out_dir = 'out'
 
-Hov8a::CsvFile.new(file_1_path, file_1_attendance_threshold_in_minutes, out_dir).process!
-Hov8a::CsvFile.new(file_2_path, file_2_attendance_threshold_in_minutes, out_dir).process!
+Hov8a::Bootcamp.new(file_1_path, file_1_attendance_threshold_in_minutes,
+                    file_2_path, file_2_attendance_threshold_in_minutes, out_dir).process!
