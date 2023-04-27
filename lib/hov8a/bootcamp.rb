@@ -25,7 +25,7 @@ module Hov8a
       ).uniq
     end
 
-    def bootcamp_non_attendees_email_index
+    def bootcamp_non_attendees_email_indexed
       return @bootcamp_non_attendees_email_index if @bootcamp_non_attendees_email_index
 
       @bootcamp_non_attendees_email_index = {}
@@ -43,7 +43,7 @@ module Hov8a
 
     def unique_non_attendees
       @unique_non_attendees ||= unique_non_attendee_emails.map do |unique_email|
-        bootcamp_non_attendees_email_index[unique_email]
+        bootcamp_non_attendees_email_indexed[unique_email]
       end
     end
 
@@ -53,12 +53,25 @@ module Hov8a
       end.compact
     end
 
+    def unique_unique_non_attendees_and_unique_attendees_below_threshold
+      return @unique_non_attendees_and_unique_attendees_below_threshold if @unique_non_attendees_and_unique_attendees_below_threshold
+
+      delinquent_attendees = unique_non_attendees + unique_attendees_below_threshold
+      delinquent_attendees_email_index = {}
+      delinquent_attendees.each do |delinquent_attendee|
+        delinquent_attendees_email_index[delinquent_attendee[4]] ||= delinquent_attendee
+      end
+
+      @unique_non_attendees_and_unique_attendees_below_threshold = delinquent_attendees_email_index.values
+    end
+
     def process!
       @day_1_file.process!
       @day_2_file.process!
       unique_non_attendees_path = File.join(@out_dir, 'unique_non_attendees_across_both_days.csv')
       unique_attendees_below_threshold_path = File.join(@out_dir, 'unique_attendees_across_both_days_below_threshold.csv')
       unique_non_attendees_and_unique_attendees_below_threshold_path = File.join(@out_dir, 'unique_non_attendees_and_unique_attendees_below_threshold.csv')
+      unique_unique_non_attendees_and_unique_attendees_below_threshold_path = File.join(@out_dir, 'unique_unique_non_attendees_and_unique_attendees_below_threshold.csv')
 
       Kernel.puts('Please wait...')
       export_csv!(unique_non_attendees_path,
@@ -72,6 +85,11 @@ module Hov8a
       export_csv!(unique_non_attendees_and_unique_attendees_below_threshold_path,
                   unique_non_attendees + unique_attendees_below_threshold,
                   "#{unique_non_attendees.count + unique_attendees_below_threshold.count} bootcamp-wide unique non attendees and unique attendees below attendance threshold exported to #{unique_non_attendees_and_unique_attendees_below_threshold_path}")
+
+      export_csv!(unique_unique_non_attendees_and_unique_attendees_below_threshold_path,
+                  unique_unique_non_attendees_and_unique_attendees_below_threshold,
+                  "#{unique_unique_non_attendees_and_unique_attendees_below_threshold.count} bootcamp-wide unique unique non attendees and unique attendees below attendance threshold exported to #{unique_unique_non_attendees_and_unique_attendees_below_threshold_path}")
+
     end
   end
 end
